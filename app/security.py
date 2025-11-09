@@ -97,11 +97,18 @@ def get_current_user(
         )
     
     payload = decode_access_token(token)
-    user_id: int = payload.get("sub")
-    if user_id is None:
+    user_id_value = payload.get("sub")
+    if user_id_value is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token payload"
+        )
+    try:
+        user_id = int(user_id_value)
+    except (TypeError, ValueError):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token subject"
         )
     
     user = db.query(User).filter(User.id == user_id).first()

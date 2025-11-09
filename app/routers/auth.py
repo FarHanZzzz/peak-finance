@@ -48,7 +48,7 @@ def login(user_data: UserLogin, response: Response, db: Session = Depends(get_db
         )
     
     # Create token
-    access_token = create_access_token(data={"sub": user.id})
+    access_token = create_access_token(data={"sub": str(user.id)})
     
     # Set httpOnly cookie for web (primary auth method)
     response.set_cookie(

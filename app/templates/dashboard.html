@@ -117,11 +117,6 @@
 
 {% block extra_js %}
 <script>
-// Check auth on page load
-if (!Auth.isAuthenticated()) {
-    window.location.href = '/auth';
-}
-
 // Dashboard state
 let dashboardData = {
     user: null,
@@ -130,6 +125,19 @@ let dashboardData = {
     goals: [],
     summary: null
 };
+
+// Check auth and initialize dashboard when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Check authentication
+    if (!Auth.isAuthenticated()) {
+        console.log('Not authenticated, redirecting to login');
+        window.location.href = '/auth';
+        return;
+    }
+    
+    // Initialize dashboard if authenticated
+    initDashboard();
+});
 
 // Initialize dashboard
 async function initDashboard() {
@@ -644,8 +652,5 @@ function createModal(title, content) {
 function closeModal() {
     document.getElementById('modalContainer').innerHTML = '';
 }
-
-// Initialize on page load
-initDashboard();
 </script>
 {% endblock %}
