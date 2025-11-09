@@ -23,10 +23,14 @@ class APIClient {
   /**
    * Build headers with auth token
    */
-  getHeaders(includeAuth = true) {
+  getHeaders(includeAuth = true, isFormData = false) {
     const headers = {
-      'Content-Type': 'application/json',
+      'Accept': 'application/json'
     };
+
+    if (!isFormData) {
+      headers['Content-Type'] = 'application/json';
+    }
 
     if (includeAuth) {
       const token = this.getToken();
@@ -82,9 +86,15 @@ class APIClient {
    */
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
+    const { auth = true, headers: customHeaders, ...rest } = options;
+    const isFormData = rest.body instanceof FormData;
+
     const config = {
-      ...options,
-      headers: this.getHeaders(options.auth !== false),
+      ...rest,
+      headers: {
+        ...this.getHeaders(auth !== false, isFormData),
+        ...(customHeaders || {})
+      }
     };
 
     try {
@@ -99,12 +109,13 @@ class APIClient {
         throw new Error('Unauthorized - please login');
       }
 
-      let data;
-      try {
-        data = await response.json();
-      } catch (e) {
-        // If response is not JSON
-        data = { detail: await response.text() || 'Request failed' };
+      let data = null;
+      if (response.status !== 204) {
+        try {
+          data = await response.json();
+        } catch (e) {
+          data = { detail: await response.text() || 'Request failed' };
+        }
       }
 
       if (!response.ok) {
@@ -138,22 +149,40 @@ class APIClient {
    * POST request
    */
   async post(endpoint, data, options = {}) {
-    return this.request(endpoint, {
+    const config = {
       ...options,
       method: 'POST',
-      body: JSON.stringify(data),
-    });
+    };
+
+    if (options.body === undefined) {
+      if (typeof FormData !== 'undefined' && data instanceof FormData) {
+        config.body = data;
+      } else if (data !== undefined && data !== null) {
+        config.body = JSON.stringify(data);
+      }
+    }
+
+    return this.request(endpoint, config);
   }
 
   /**
    * PUT request
    */
   async put(endpoint, data, options = {}) {
-    return this.request(endpoint, {
+    const config = {
       ...options,
       method: 'PUT',
-      body: JSON.stringify(data),
-    });
+    };
+
+    if (options.body === undefined) {
+      if (typeof FormData !== 'undefined' && data instanceof FormData) {
+        config.body = data;
+      } else if (data !== undefined && data !== null) {
+        config.body = JSON.stringify(data);
+      }
+    }
+
+    return this.request(endpoint, config);
   }
 
   /**

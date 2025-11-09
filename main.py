@@ -8,7 +8,7 @@ from pathlib import Path
 
 from app.db import init_db
 from app.settings import settings
-from app.routers import auth, profile, data, calc
+from app.routers import auth, profile, data, calc, ai
 
 # Initialize FastAPI
 app = FastAPI(
@@ -40,6 +40,7 @@ app.include_router(auth.router, prefix="/api")
 app.include_router(profile.router, prefix="/api")
 app.include_router(data.router, prefix="/api")
 app.include_router(calc.router, prefix="/api")
+app.include_router(ai.router, prefix="/api")
 
 
 @app.on_event("startup")

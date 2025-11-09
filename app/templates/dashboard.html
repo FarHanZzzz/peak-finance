@@ -394,6 +394,11 @@ function formatNumber(num) {
     return new Intl.NumberFormat('en-BD').format(Math.round(num));
 }
 
+function getSafeNumber(value, fallback = 0) {
+    const num = Number(value);
+    return Number.isFinite(num) ? num : fallback;
+}
+
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
@@ -614,21 +619,331 @@ async function deleteGoal(id) {
     }
 }
 
-// Tool functions (placeholders)
+// Tool functions
 function showLoanCalculator() {
-    showToast('Loan calculator coming soon!', 'info');
+    const income = dashboardData.user?.monthly_net_income || 0;
+    const existingDebt = dashboardData.debts?.reduce((sum, debt) => sum + (debt.current_emi || 0), 0) || 0;
+
+    createModal('Loan Calculator', `
+        <form id="loanCalcForm" class="modal-form">
+            <div class="form-group">
+                <label for="loanIncome">Monthly Net Income (৳)</label>
+                <input type="number" id="loanIncome" min="0" step="0.01" value="${income.toFixed(2)}" required>
+            </div>
+            <div class="form-group">
+                <label for="loanExistingDebt">Existing Monthly Debt (৳)</label>
+                <input type="number" id="loanExistingDebt" min="0" step="0.01" value="${existingDebt.toFixed(2)}" required>
+            </div>
+            <div class="form-group grid">
+                <div>
+                    <label for="loanRate">Interest Rate (% p.a.)</label>
+                    <input type="number" id="loanRate" min="0" step="0.1" value="12" required>
+                </div>
+                <div>
+                    <label for="loanTerm">Term (months)</label>
+                    <input type="number" id="loanTerm" min="6" step="1" value="60" required>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Calculate</button>
+            </div>
+            <div id="loanCalcResult" class="tool-result hidden"></div>
+        </form>
+    `);
+
+    const form = document.getElementById('loanCalcForm');
+    const resultBox = document.getElementById('loanCalcResult');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const payload = {
+            income: parseFloat(document.getElementById('loanIncome').value),
+            existing_monthly_debt: parseFloat(document.getElementById('loanExistingDebt').value),
+            annual_rate_pct: parseFloat(document.getElementById('loanRate').value),
+            term_months: parseInt(document.getElementById('loanTerm').value)
+        };
+
+        if (Object.values(payload).some(v => isNaN(v) || v < 0)) {
+            showToast('Please enter valid positive numbers.', 'error');
+            return;
+        }
+
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Calculating…';
+        resultBox.classList.remove('hidden');
+        resultBox.innerHTML = '<div class="loading-inline"><i class="fas fa-spinner fa-spin"></i> Calculating affordability…</div>';
+
+        try {
+            const result = await API.post('/calc/loan-pre-assessment', payload);
+            const affordableEmi = getSafeNumber(result.affordable_emi);
+            const estimatedPrincipal = getSafeNumber(result.estimated_principal);
+            const dti = getSafeNumber(result.dti);
+            const stressTests = Array.isArray(result.stress_tests) ? result.stress_tests : [];
+
+            const stressRows = stressTests.map(test => {
+                const newEmi = formatCurrency(getSafeNumber(test.new_emi));
+                const dtiVal = formatPercent(getSafeNumber(test.dti));
+                const scenario = escapeHtml(test.scenario || 'Scenario');
+                const status = test.is_affordable ? '<span class="badge success">Within limit</span>' : '<span class="badge warning">Above limit</span>';
+                return `
+                <tr>
+                    <td>${scenario}</td>
+                    <td>${newEmi}</td>
+                    <td>${dtiVal}</td>
+                    <td>${status}</td>
+                </tr>
+                `;
+            }).join('');
+
+            resultBox.innerHTML = `
+                <div class="result-summary">
+                    <div>
+                        <p class="label">Affordable EMI</p>
+                        <p class="value">${formatCurrency(affordableEmi)}</p>
+                    </div>
+                    <div>
+                        <p class="label">Estimated Principal</p>
+                        <p class="value">${formatCurrency(estimatedPrincipal)}</p>
+                    </div>
+                    <div>
+                        <p class="label">Current DTI</p>
+                        <p class="value">${formatPercent(dti)}</p>
+                    </div>
+                </div>
+                <div class="result-table-wrapper">
+                    <h4>Stress Scenarios</h4>
+                    <table class="result-table">
+                        <thead>
+                            <tr>
+                                <th>Scenario</th>
+                                <th>New EMI</th>
+                                <th>DTI</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${stressRows || '<tr><td colspan="4">No stress tests available.</td></tr>'}
+                        </tbody>
+                    </table>
+                </div>
+                ${result.meta?.disclaimer ? `<p class="disclaimer">${escapeHtml(result.meta.disclaimer)}</p>` : ''}
+            `;
+        } catch (error) {
+            resultBox.innerHTML = `<p class="error">${escapeHtml(error.message || 'Calculation failed')}</p>`;
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+    });
 }
 
 function showInflationCalculator() {
-    showToast('Inflation forecast coming soon!', 'info');
+    const essentialsTotal = dashboardData.expenses?.reduce((sum, item) => sum + (item.amount || 0), 0) || 0;
+
+    createModal('Inflation Forecast', `
+        <form id="inflationForm" class="modal-form">
+            <div class="form-group">
+                <label for="inflationCurrent">Monthly Essential Spend (৳)</label>
+                <input type="number" id="inflationCurrent" min="0" step="0.01" value="${essentialsTotal.toFixed(2)}" required>
+                <small>Sum of rent, groceries, utilities, education, etc.</small>
+            </div>
+            <div class="form-group grid">
+                <div>
+                    <label for="inflationRate">Expected CPI (% p.a.)</label>
+                    <input type="number" id="inflationRate" min="0" step="0.1" value="7" required>
+                </div>
+                <div>
+                    <label for="inflationYears">Projection Horizon (years)</label>
+                    <input type="number" id="inflationYears" min="1" max="30" step="1" value="5" required>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Forecast</button>
+            </div>
+            <div id="inflationResult" class="tool-result hidden"></div>
+        </form>
+    `);
+
+    const form = document.getElementById('inflationForm');
+    const resultBox = document.getElementById('inflationResult');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const payload = {
+            current_price: parseFloat(document.getElementById('inflationCurrent').value),
+            annual_cpi_rate: parseFloat(document.getElementById('inflationRate').value),
+            years: parseInt(document.getElementById('inflationYears').value)
+        };
+
+        if (Object.values(payload).some(v => isNaN(v) || v < 0)) {
+            showToast('Please enter valid positive numbers.', 'error');
+            return;
+        }
+
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Projecting…';
+        resultBox.classList.remove('hidden');
+        resultBox.innerHTML = '<div class="loading-inline"><i class="fas fa-spinner fa-spin"></i> Calculating projection…</div>';
+
+        try {
+            const result = await API.post('/calc/inflation-forecast', payload);
+            const projections = Array.isArray(result.projections) ? result.projections : [];
+            const rows = projections.map(item => `
+                <tr>
+                    <td>Year ${escapeHtml(String(item.year))}</td>
+                    <td>${formatCurrency(getSafeNumber(item.estimated_price))}</td>
+                </tr>
+            `).join('');
+
+            resultBox.innerHTML = `
+                <div class="result-table-wrapper">
+                    <h4>Projected Monthly Cost</h4>
+                    <table class="result-table">
+                        <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>Estimated Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows || '<tr><td colspan="2">No projections generated.</td></tr>'}
+                        </tbody>
+                    </table>
+                </div>
+                ${result.meta?.disclaimer ? `<p class="disclaimer">${escapeHtml(result.meta.disclaimer)}</p>` : ''}
+            `;
+        } catch (error) {
+            resultBox.innerHTML = `<p class="error">${escapeHtml(error.message || 'Forecast failed')}</p>`;
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+    });
 }
 
 function showAIAdvisor() {
-    showToast('AI Advisor coming soon!', 'info');
+    createModal('AI Financial Advisor', `
+        <form id="aiForm" class="modal-form">
+            <div class="form-group">
+                <label for="aiQuestion">Ask a question</label>
+                <textarea id="aiQuestion" rows="5" placeholder="e.g., How can I optimize my monthly budget?" required></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Get Guidance</button>
+            </div>
+            <div id="aiResult" class="tool-result hidden"></div>
+        </form>
+    `);
+
+    const form = document.getElementById('aiForm');
+    const resultBox = document.getElementById('aiResult');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const question = document.getElementById('aiQuestion').value.trim();
+        if (!question) {
+            showToast('Please enter a question.', 'error');
+            return;
+        }
+
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Thinking…';
+        resultBox.classList.remove('hidden');
+        resultBox.innerHTML = '<div class="loading-inline"><i class="fas fa-spinner fa-spin"></i> Generating guidance…</div>';
+
+        try {
+            const result = await API.post('/ai/ask', { question });
+            const answerHtml = escapeHtml(result.answer).replace(/\n/g, '<br>');
+            resultBox.innerHTML = `
+                <div class="ai-response ${result.is_blocked ? 'blocked' : ''}">
+                    <p>${answerHtml}</p>
+                    ${result.is_blocked ? '<p class="warning">This topic requires a licensed financial services partner.</p>' : ''}
+                </div>
+                ${result.meta?.disclaimer ? `<p class="disclaimer">${escapeHtml(result.meta.disclaimer)}</p>` : ''}
+            `;
+        } catch (error) {
+            resultBox.innerHTML = `<p class="error">${escapeHtml(error.message || 'AI advisor unavailable')}</p>`;
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+    });
 }
 
 function showDataImport() {
-    showToast('Data import coming soon!', 'info');
+    createModal('Import Transactions (CSV)', `
+        <form id="importForm" class="modal-form" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="importFile">Upload CSV</label>
+                <input type="file" id="importFile" accept=".csv" required>
+                <small>Expected columns: date, description, category (optional), amount</small>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Import</button>
+            </div>
+            <div id="importResult" class="tool-result hidden"></div>
+        </form>
+    `);
+
+    const form = document.getElementById('importForm');
+    const fileInput = document.getElementById('importFile');
+    const resultBox = document.getElementById('importResult');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (!fileInput.files || !fileInput.files.length) {
+            showToast('Please select a CSV file to upload.', 'error');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        formData.append('has_header', 'true');
+
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Importing…';
+        resultBox.classList.remove('hidden');
+        resultBox.innerHTML = '<div class="loading-inline"><i class="fas fa-spinner fa-spin"></i> Processing file…</div>';
+
+        try {
+            const result = await API.post('/data/import-csv', formData);
+            resultBox.innerHTML = `
+                <div class="success">
+                    <p>${escapeHtml(result.message)}</p>
+                    <ul>
+                        <li><strong>Rows processed:</strong> ${getSafeNumber(result.rows_processed)}</li>
+                        <li><strong>Expenses added:</strong> ${getSafeNumber(result.expenses_added)}</li>
+                    </ul>
+                </div>
+            `;
+
+            await Promise.all([
+                loadExpenses(),
+                loadDashboardSummary()
+            ]);
+        } catch (error) {
+            resultBox.innerHTML = `<p class="error">${escapeHtml(error.message || 'Import failed')}</p>`;
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+    });
 }
 
 // Modal helper functions

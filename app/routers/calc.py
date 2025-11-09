@@ -1,5 +1,4 @@
 """Calculation endpoints for financial computations."""
-from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.db import get_db
@@ -15,6 +14,39 @@ from app.services import calculators
 from app.services.compliance import get_loan_meta, get_projection_meta, get_calc_meta
 from app.settings import settings
 
+
+def _simulate_payoff(
+    principal: float,
+    annual_rate_pct: float,
+    monthly_payment: float,
+    max_months: int = 1200
+) -> tuple[int, float]:
+    """Simulate loan payoff with optional extra payments."""
+    if monthly_payment <= 0 or principal <= 0:
+        return 0, 0.0
+
+    monthly_rate = annual_rate_pct / 100 / 12
+    balance = principal
+    months = 0
+    total_interest = 0.0
+
+    while balance > 0 and months < max_months:
+        interest = balance * monthly_rate if monthly_rate > 0 else 0.0
+        principal_payment = monthly_payment - interest
+
+        if principal_payment <= 0:
+            # Payment too small to cover interest; stop simulation
+            break
+
+        balance -= principal_payment
+        if balance < 1e-6:
+            balance = 0.0
+
+        total_interest += interest
+        months += 1
+
+    return months, total_interest
+
 router = APIRouter(prefix="/calc", tags=["calculations"])
 
 
@@ -23,67 +55,53 @@ def loan_pre_assessment(
     request: LoanPreAssessmentRequest,
     user: User = Depends(get_current_user)
 ):
-    """
-    Estimate loan affordability (educational only).
-    
-    Returns DTI, affordable EMI cap, estimated principal, and stress test scenarios.
-    """
-    # Base DTI
-    dti = calculators.dti(request.existing_monthly_debt, request.income)
-    
-    # Affordable EMI cap (40% of income - existing debt)
-    max_total_debt = request.income * settings.MAX_DTI_RATIO
-    affordable_new_emi = max_total_debt - request.existing_monthly_debt
-    affordable_new_emi = max(0, affordable_new_emi)
-    
-    # Estimated principal
-    principal_est = calculators.principal_from_emi(
-        affordable_new_emi,
+    """Estimate how much additional loan a user can afford."""
+
+    base_dti = calculators.dti(request.existing_monthly_debt, request.income)
+
+    # Maximum total debt servicing allowed under DTI guardrail
+    max_debt_capacity = request.income * settings.MAX_DTI_RATIO
+    affordable_emi = max(0.0, max_debt_capacity - request.existing_monthly_debt)
+
+    estimated_principal = calculators.principal_from_emi(
+        affordable_emi,
         request.annual_rate_pct,
         request.term_months
     )
-    
-    # Stress tests
+
     stress_tests = []
-    
-    # Scenario 1: +2% interest rate
+
+    # Stress scenario: rate rises by 2%
     stress_rate = request.annual_rate_pct + 2
-    stress_emi_1 = calculators.emi(principal_est, stress_rate, request.term_months)
-    stress_dti_1 = calculators.dti(
-        request.existing_monthly_debt + stress_emi_1,
+    stress_emi_rate = calculators.emi(estimated_principal, stress_rate, request.term_months)
+    stress_dti_rate = calculators.dti(
+        request.existing_monthly_debt + stress_emi_rate,
         request.income
     )
     stress_tests.append(StressTestResult(
         scenario="Interest rate +2%",
-        dti=round(stress_dti_1, 4),
-        affordable_emi=round(affordable_new_emi, 2),
-        principal_est=round(principal_est, 2)
+        new_emi=round(stress_emi_rate, 2),
+        dti=round(stress_dti_rate, 4),
+        is_affordable=stress_dti_rate <= settings.MAX_DTI_RATIO
     ))
-    
-    # Scenario 2: -10% income
-    stress_income = request.income * 0.9
-    stress_affordable_2 = (stress_income * settings.MAX_DTI_RATIO) - request.existing_monthly_debt
-    stress_affordable_2 = max(0, stress_affordable_2)
-    stress_principal_2 = calculators.principal_from_emi(
-        stress_affordable_2,
-        request.annual_rate_pct,
-        request.term_months
-    )
-    stress_dti_2 = calculators.dti(
-        request.existing_monthly_debt,
-        stress_income
+
+    # Stress scenario: income drops by 10%
+    reduced_income = request.income * 0.9
+    stress_dti_income = calculators.dti(
+        request.existing_monthly_debt + affordable_emi,
+        reduced_income
     )
     stress_tests.append(StressTestResult(
         scenario="Income -10%",
-        dti=round(stress_dti_2, 4),
-        affordable_emi=round(stress_affordable_2, 2),
-        principal_est=round(stress_principal_2, 2)
+        new_emi=round(affordable_emi, 2),
+        dti=round(stress_dti_income, 4),
+        is_affordable=stress_dti_income <= settings.MAX_DTI_RATIO
     ))
-    
+
     return LoanPreAssessmentResponse(
-        dti=round(dti, 4),
-        affordable_emi_cap=round(affordable_new_emi, 2),
-        principal_est=round(principal_est, 2),
+        dti=round(base_dti, 4),
+        affordable_emi=round(affordable_emi, 2),
+        estimated_principal=round(estimated_principal, 2),
         stress_tests=stress_tests,
         meta=get_loan_meta()
     )
@@ -94,24 +112,37 @@ def loan_payoff_plan(
     request: LoanPayoffPlanRequest,
     user: User = Depends(get_current_user)
 ):
-    """
-    Calculate payoff plan for existing loan.
-    
-    Returns required EMI, total interest, and total payment.
-    """
-    required_emi = calculators.required_emi_to_finish(
+    """Calculate EMI and payoff impact of extra payments."""
+
+    base_emi = calculators.emi(
         request.principal,
         request.annual_rate_pct,
-        request.months_remaining
+        request.term_months
     )
-    
-    total_payment = required_emi * request.months_remaining
-    total_interest = total_payment - request.principal
-    
+    total_paid = base_emi * request.term_months
+    total_interest = total_paid - request.principal
+
+    months_saved = 0
+    interest_saved = 0.0
+
+    if request.extra_payment > 0:
+        accelerated_payment = base_emi + request.extra_payment
+        accel_months, accel_interest = _simulate_payoff(
+            request.principal,
+            request.annual_rate_pct,
+            accelerated_payment
+        )
+
+        if accel_months and accel_months < request.term_months:
+            months_saved = request.term_months - accel_months
+            interest_saved = max(0.0, total_interest - accel_interest)
+
     return LoanPayoffPlanResponse(
-        required_emi=round(required_emi, 2),
+        monthly_emi=round(base_emi, 2),
         total_interest=round(total_interest, 2),
-        total_payment=round(total_payment, 2),
+        total_paid=round(total_paid, 2),
+        months_saved=months_saved,
+        interest_saved=round(interest_saved, 2),
         meta=get_calc_meta()
     )
 
@@ -121,68 +152,22 @@ def inflation_forecast(
     request: InflationForecastRequest,
     user: User = Depends(get_current_user)
 ):
-    """
-    Project inflation impact on essential expenses.
-    
-    Returns base, optimistic, and pessimistic scenarios.
-    """
-    base_projections = []
-    optimistic_projections = []
-    pessimistic_projections = []
-    
-    total_current = sum(item.current_cost * item.weight for item in request.items)
-    total_projected = 0.0
-    
-    for item in request.items:
-        # Base scenario
-        base_future = calculators.inflation_projection(
-            item.current_cost,
-            request.cpi_rate,
-            request.years
+    """Project future cost of an expense given CPI assumptions."""
+
+    projections = []
+    for year in range(1, request.years + 1):
+        future_cost = calculators.inflation_projection(
+            request.current_price,
+            request.annual_cpi_rate,
+            year
         )
-        base_increase = ((base_future - item.current_cost) / item.current_cost) * 100 if item.current_cost > 0 else 0
-        base_projections.append(InflationProjection(
-            name=item.name,
-            current_cost=round(item.current_cost, 2),
-            projected_cost=round(base_future, 2),
-            increase_pct=round(base_increase, 2)
+        projections.append(InflationProjection(
+            year=year,
+            estimated_price=round(future_cost, 2)
         ))
-        total_projected += base_future * item.weight
-        
-        # Optimistic scenario (-2% from base)
-        opt_future = calculators.inflation_projection(
-            item.current_cost,
-            max(0, request.cpi_rate - 2),
-            request.years
-        )
-        opt_increase = ((opt_future - item.current_cost) / item.current_cost) * 100 if item.current_cost > 0 else 0
-        optimistic_projections.append(InflationProjection(
-            name=item.name,
-            current_cost=round(item.current_cost, 2),
-            projected_cost=round(opt_future, 2),
-            increase_pct=round(opt_increase, 2)
-        ))
-        
-        # Pessimistic scenario (+3% from base)
-        pess_future = calculators.inflation_projection(
-            item.current_cost,
-            request.cpi_rate + 3,
-            request.years
-        )
-        pess_increase = ((pess_future - item.current_cost) / item.current_cost) * 100 if item.current_cost > 0 else 0
-        pessimistic_projections.append(InflationProjection(
-            name=item.name,
-            current_cost=round(item.current_cost, 2),
-            projected_cost=round(pess_future, 2),
-            increase_pct=round(pess_increase, 2)
-        ))
-    
+
     return InflationForecastResponse(
-        base_scenario=base_projections,
-        optimistic_scenario=optimistic_projections,
-        pessimistic_scenario=pessimistic_projections,
-        total_current=round(total_current, 2),
-        total_projected=round(total_projected, 2),
+        projections=projections,
         meta=get_projection_meta()
     )
 
