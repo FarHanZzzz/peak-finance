@@ -3,114 +3,122 @@
 {% block title %}Dashboard - Peak Finance{% endblock %}
 
 {% block content %}
-<section class="dashboard-section">
+<section class="dashboard-shell">
     <div class="container">
-        <!-- Dashboard Header -->
-        <div class="dashboard-header">
-            <div>
-                <h1>Welcome Back! 👋</h1>
-                <p id="userWelcome">Loading...</p>
+        <header class="dashboard-header">
+            <div class="dashboard-headline">
+                <span class="eyebrow">Personal finance cockpit</span>
+                <h1>Welcome back 👋</h1>
+                <p id="userWelcome">Loading…</p>
             </div>
             <div class="header-actions">
-                <button class="btn btn-secondary" onclick="showProfileModal()">
-                    <i class="fas fa-user-circle"></i> Profile
+                <button class="btn btn-outline" onclick="showProfileModal()">
+                    <i class="fas fa-user-circle"></i>
+                    Profile & preferences
                 </button>
             </div>
-        </div>
+        </header>
 
-        <!-- Quick Stats Cards -->
-        <div class="stats-grid" id="statsGrid">
-            <div class="stat-card loading-placeholder">
-                <div class="stat-icon"><i class="fas fa-spinner fa-spin"></i></div>
-                <div class="stat-info">
-                    <p class="stat-label">Loading...</p>
-                    <h3 class="stat-value">---</h3>
+        <section class="kpi-grid" id="statsGrid">
+            <article class="kpi-card skeleton">
+                <div class="kpi-icon"><i class="fas fa-spinner fa-spin"></i></div>
+                <div>
+                    <p class="kpi-label">Loading…</p>
+                    <h3 class="kpi-value">---</h3>
                 </div>
-            </div>
-        </div>
+            </article>
+        </section>
 
-        <!-- Main Dashboard Content -->
-        <div class="dashboard-content-grid">
-            <!-- Left Column: Expenses & Debts -->
-            <div class="dashboard-col">
-                <!-- Expenses Section -->
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-receipt"></i> Expenses</h3>
+        <div class="dashboard-layout">
+            <div class="panel-column">
+                <article class="panel">
+                    <header class="panel-header">
+                        <div>
+                            <h2><i class="fas fa-receipt"></i> Expenses timeline</h2>
+                            <p>Track fixed and variable outflows to understand where your taka travels.</p>
+                        </div>
                         <button class="btn btn-small btn-primary" onclick="showAddExpenseModal()">
-                            <i class="fas fa-plus"></i> Add
+                            <i class="fas fa-plus"></i> Add expense
                         </button>
-                    </div>
-                    <div id="expensesList" class="items-list">
+                    </header>
+                    <div id="expensesList" class="panel-body items-list">
                         <div class="loading-placeholder">
-                            <i class="fas fa-spinner fa-spin"></i> Loading expenses...
+                            <i class="fas fa-spinner fa-spin"></i> Loading expenses…
                         </div>
                     </div>
-                </div>
+                </article>
 
-                <!-- Debts Section -->
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-credit-card"></i> Debts & Loans</h3>
+                <article class="panel">
+                    <header class="panel-header">
+                        <div>
+                            <h2><i class="fas fa-credit-card"></i> Debt & loans</h2>
+                            <p>Monitor EMI impact and remaining principals across all liabilities.</p>
+                        </div>
                         <button class="btn btn-small btn-primary" onclick="showAddDebtModal()">
-                            <i class="fas fa-plus"></i> Add
+                            <i class="fas fa-plus"></i> Add debt
                         </button>
-                    </div>
-                    <div id="debtsList" class="items-list">
+                    </header>
+                    <div id="debtsList" class="panel-body items-list">
                         <div class="loading-placeholder">
-                            <i class="fas fa-spinner fa-spin"></i> Loading debts...
+                            <i class="fas fa-spinner fa-spin"></i> Loading debts…
                         </div>
                     </div>
-                </div>
+                </article>
             </div>
 
-            <!-- Right Column: Goals & Calculators -->
-            <div class="dashboard-col">
-                <!-- Goals Section -->
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-bullseye"></i> Financial Goals</h3>
+            <div class="panel-column">
+                <article class="panel">
+                    <header class="panel-header">
+                        <div>
+                            <h2><i class="fas fa-bullseye"></i> Financial goals</h2>
+                            <p>Visualize progress bars, priorities, and time-to-target in one place.</p>
+                        </div>
                         <button class="btn btn-small btn-primary" onclick="showAddGoalModal()">
-                            <i class="fas fa-plus"></i> Add
+                            <i class="fas fa-plus"></i> Add goal
                         </button>
-                    </div>
-                    <div id="goalsList" class="items-list">
+                    </header>
+                    <div id="goalsList" class="panel-body items-list">
                         <div class="loading-placeholder">
-                            <i class="fas fa-spinner fa-spin"></i> Loading goals...
+                            <i class="fas fa-spinner fa-spin"></i> Loading goals…
                         </div>
                     </div>
-                </div>
+                </article>
 
-                <!-- Quick Tools -->
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-calculator"></i> Quick Tools</h3>
-                    </div>
-                    <div class="tools-grid">
+                <article class="panel quick-tools">
+                    <header class="panel-header">
+                        <div>
+                            <h2><i class="fas fa-wand-magic"></i> Quick tools</h2>
+                            <p>Launch calculators and automations without leaving your dashboard.</p>
+                        </div>
+                    </header>
+                    <div class="tool-grid">
                         <button class="tool-button" onclick="showLoanCalculator()">
-                            <i class="fas fa-hand-holding-usd"></i>
-                            <span>Loan Calculator</span>
+                            <i class="fas fa-hand-holding-dollar"></i>
+                            <span>Loan affordability</span>
                         </button>
                         <button class="tool-button" onclick="showInflationCalculator()">
                             <i class="fas fa-chart-line"></i>
-                            <span>Inflation Forecast</span>
+                            <span>Inflation forecast</span>
                         </button>
                         <button class="tool-button" onclick="showAIAdvisor()">
                             <i class="fas fa-robot"></i>
-                            <span>AI Advisor</span>
+                            <span>AI advisor</span>
                         </button>
                         <button class="tool-button" onclick="showDataImport()">
                             <i class="fas fa-file-import"></i>
-                            <span>Import Data</span>
+                            <span>Import CSV</span>
                         </button>
                     </div>
-                </div>
+                    <div class="tool-note">
+                        <i class="fas fa-shield-check"></i>
+                        <p>All actions remain educational. Sensitive prompts are logged and gated per BFIU guidelines.</p>
+                    </div>
+                </article>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Modals will be injected here -->
 <div id="modalContainer"></div>
 
 {% endblock %}
@@ -128,14 +136,10 @@ let dashboardData = {
 
 // Check auth and initialize dashboard when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    // Check authentication
     if (!Auth.isAuthenticated()) {
-        console.log('Not authenticated, redirecting to login');
         window.location.href = '/auth';
         return;
     }
-    
-    // Initialize dashboard if authenticated
     initDashboard();
 });
 

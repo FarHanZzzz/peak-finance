@@ -1,190 +1,214 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Hero Section -->
 <section id="home" class="hero">
-    <div class="container">
-        <div class="hero-content">
-            <div class="hero-text">
-                <h1>Smart Financial Planning for a <span class="gradient-text">Better Tomorrow</span></h1>
-                <p>AI-powered personal finance advisor designed for Bangladesh. Get personalized budgeting advice, predict future costs, and understand loan eligibility—all educational, all free.</p>
-                <div class="hero-buttons">
-                    <a href="/auth?mode=register" class="btn btn-primary">Get Started Free</a>
-                    <a href="#features" class="btn btn-secondary">See How It Works</a>
+    <div class="container hero-grid">
+        <div class="hero-copy">
+            <span class="hero-eyebrow">Education-first finance OS</span>
+            <h1>Bring clarity, confidence, and joy to every taka you manage.</h1>
+            <p>Peak Finance pairs transparent Bangladeshi market data with AI-powered guidance so you can plan goals, stress-test loans, and stay on top of your cash flow. 100% educational, crafted for emerging wealth builders.</p>
+            <div class="hero-actions">
+                <a href="/auth?mode=register" class="btn btn-primary btn-glow">Create free account</a>
+                <a href="#features" class="btn btn-outline">Preview the platform</a>
+            </div>
+            <div class="hero-metrics">
+                <div class="metric-card">
+                    <span class="metric-label">Coverage</span>
+                    <span class="metric-value">৳6.5L+</span>
+                    <p>Financial scenarios simulated across major Bangladeshi metro costs.</p>
                 </div>
-                <div class="hero-stats">
-                    <div class="stat-item">
-                        <i class="fas fa-shield-alt"></i>
-                        <div>
-                            <h3>100%</h3>
-                            <p>Educational</p>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <i class="fas fa-lock"></i>
-                        <div>
-                            <h3>Secure</h3>
-                            <p>Data Privacy</p>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <i class="fas fa-code"></i>
-                        <div>
-                            <h3>Open</h3>
-                            <p>Source Code</p>
-                        </div>
-                    </div>
+                <div class="metric-card">
+                    <span class="metric-label">Insights</span>
+                    <span class="metric-value">AI + BFIU aware</span>
+                    <p>Guidance tuned for local compliance, bilingual delivery, and privacy.</p>
                 </div>
             </div>
-            <div class="hero-image">
-                <img src="https://imagedelivery.net/xMnwd1aoy-PQ8Klk2JdGdw/e976b8f7-bf2a-4190-58c8-e1f21bf2c500/public" 
-                     alt="Financial dashboard" width="600" height="480">
+        </div>
+        <div class="hero-visual">
+            <div class="visual-card primary">
+                <div class="visual-header">
+                    <span class="title">Monthly Flow</span>
+                    <span class="badge">৳120,450</span>
+                </div>
+                <ul class="visual-list">
+                    <li><span>Income</span><strong>৳150,000</strong></li>
+                    <li><span>Expenses</span><strong>৳82,400</strong></li>
+                    <li><span>Debt EMI</span><strong>৳28,000</strong></li>
+                </ul>
+                <div class="visual-progress">
+                    <div class="progress-bar"><span style="width: 68%"></span></div>
+                    <small>Ready to invest 32% surplus this month.</small>
+                </div>
+            </div>
+            <div class="visual-card secondary">
+                <div class="avatar-bubble">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3>“Your DTI is healthy. Redirect ৳12k to your emergency fund this month.”</h3>
+                <p>AI advisor · Bengali + English support</p>
             </div>
         </div>
     </div>
+    <div class="hero-backdrop" aria-hidden="true"></div>
 </section>
 
-<!-- Features Section -->
 <section id="features" class="section">
     <div class="container">
-        <div class="section-header">
-            <h2>Everything You Need to Master Your Finances</h2>
-            <p>Professional-grade tools, simplified for everyday users</p>
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">Full-stack planning</span>
+                <h2>Everything you need for confident money moves</h2>
+            </div>
+            <p>Dashboards, calculators, and AI co-pilots that respect regulated boundaries while empowering your personal finance literacy.</p>
         </div>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-brain"></i>
-                </div>
-                <h3>AI Financial Advisor</h3>
-                <p>Get personalized insights based on your income, expenses, and goals. Educational AI guidance in Bengali and English.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-calculator"></i>
-                </div>
-                <h3>Loan Calculator</h3>
-                <p>Calculate EMI, DTI ratio, and loan affordability. Stress-test scenarios with interest rate changes and income fluctuations.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <h3>Inflation Forecasting</h3>
-                <p>Project future costs of essentials based on CPI data. Plan for rice, utilities, education, and more.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-piggy-bank"></i>
-                </div>
-                <h3>Goal Tracking</h3>
-                <p>Set savings goals for emergency funds, education, or hajj. Track progress and get actionable recommendations.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-file-invoice-dollar"></i>
-                </div>
-                <h3>Expense Management</h3>
-                <p>Track fixed and variable expenses. Import bank statements (CSV). Categorize spending automatically.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <h3>Privacy-First</h3>
-                <p>Your data stays yours. No sharing with third parties. Option to opt-out of AI training data.</p>
-            </div>
+        <div class="feature-grid">
+            <article class="feature-card accent-blue">
+                <i class="fas fa-brain"></i>
+                <h3>Guided by AI</h3>
+                <p>Ask budgeting questions in Bengali or English. Intent classification keeps regulated tasks gated while still nudging you forward.</p>
+            </article>
+            <article class="feature-card accent-purple">
+                <i class="fas fa-chart-line"></i>
+                <h3>Live dashboards</h3>
+                <p>See surplus, DTI, and goal progress in real time. Every card pulls straight from your tracked income, spending, and debts.</p>
+            </article>
+            <article class="feature-card accent-amber">
+                <i class="fas fa-house"></i>
+                <h3>Loan stress tests</h3>
+                <p>Project EMI impact with interest rate shocks and income drops. Understand affordability before you sign.</p>
+            </article>
+            <article class="feature-card accent-teal">
+                <i class="fas fa-chart-area"></i>
+                <h3>Inflation forecasting</h3>
+                <p>Project essentials like rice, utilities, and tuition with CPI-informed projections tailored to Bangladesh.</p>
+            </article>
+            <article class="feature-card accent-rose">
+                <i class="fas fa-piggy-bank"></i>
+                <h3>Priority goals</h3>
+                <p>Rank savings goals, monitor progress rings, and receive gentle nudges when allocations slip.</p>
+            </article>
+            <article class="feature-card accent-slate">
+                <i class="fas fa-shield-halved"></i>
+                <h3>Privacy-first</h3>
+                <p>Cookies stay local, no bank scraping, and audit logs track every sensitive touch. Fully open-source for trust.</p>
+            </article>
         </div>
     </div>
 </section>
 
-<!-- How It Works -->
-<section id="how-it-works" class="section bg-light">
+<section class="section section-alt">
     <div class="container">
-        <div class="section-header">
-            <h2>How Peak Finance Works</h2>
-            <p>Three simple steps to financial clarity</p>
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">Three-step onboarding</span>
+                <h2>Built for rapid clarity, not spreadsheets</h2>
+            </div>
         </div>
         <div class="steps-grid">
-            <div class="step-card">
-                <div class="step-number">1</div>
-                <h3>Create Your Profile</h3>
-                <p>Sign up with email. Add your monthly income, expenses, and debts. Set your risk tolerance.</p>
-            </div>
-            <div class="step-card">
-                <div class="step-number">2</div>
-                <h3>Use Smart Calculators</h3>
-                <p>Calculate loan affordability, project inflation, plan debt payoff. All formulas transparent and educational.</p>
-            </div>
-            <div class="step-card">
-                <div class="step-number">3</div>
-                <h3>Get AI Insights</h3>
-                <p>Receive personalized budget advice, spending alerts, and goal recommendations. Chat with AI for financial questions.</p>
-            </div>
+            <article class="step-card">
+                <span class="step-number">01</span>
+                <h3>Profile DNA</h3>
+                <p>Add income, risk appetite, and essential living costs. Peak Finance calibrates to your city and lifestyle.</p>
+            </article>
+            <article class="step-card">
+                <span class="step-number">02</span>
+                <h3>Import reality</h3>
+                <p>Log expenses or import CSV statements. Smart heuristics auto-label fixed vs variable and highlight leakages.</p>
+            </article>
+            <article class="step-card">
+                <span class="step-number">03</span>
+                <h3>Activate guidance</h3>
+                <p>Unlock calculators and AI advice. Stress test loans, forecast inflation, and receive tailored savings nudges.</p>
+            </article>
         </div>
     </div>
 </section>
 
-<!-- Tools Preview -->
 <section id="tools" class="section">
     <div class="container">
-        <div class="section-header">
-            <h2>Financial Calculators</h2>
-            <p>Professional tools, zero cost</p>
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">Financial playbooks</span>
+                <h2>Powerful calculators that feel playful</h2>
+            </div>
+            <p>Tap any tool inside your dashboard. Results render instantly with stress scenarios, best-practice tips, and next actions.</p>
         </div>
-        <div class="tools-grid">
-            <div class="tool-card">
-                <h3><i class="fas fa-home"></i> Loan Pre-Assessment</h3>
-                <p>Calculate DTI ratio and affordable EMI based on income and existing debts.</p>
-                <a href="/dashboard#loan-calc" class="btn btn-outline">Try Calculator</a>
-            </div>
-            <div class="tool-card">
-                <h3><i class="fas fa-calendar-check"></i> Payoff Planner</h3>
-                <p>See how fast you can pay off debt with different payment amounts.</p>
-                <a href="/dashboard#payoff" class="btn btn-outline">Plan Payoff</a>
-            </div>
-            <div class="tool-card">
-                <h3><i class="fas fa-chart-area"></i> Inflation Forecaster</h3>
-                <p>Project costs of essentials over 1-30 years with Bangladesh CPI data.</p>
-                <a href="/dashboard#inflation" class="btn btn-outline">Forecast Costs</a>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Compliance & Disclaimers -->
-<section id="about" class="section bg-light">
-    <div class="container">
-        <div class="compliance-box">
-            <h3><i class="fas fa-info-circle"></i> Important Information</h3>
-            <div class="disclaimer-grid">
-                <div class="disclaimer-item">
-                    <h4>Educational Only</h4>
-                    <p>Peak Finance is an educational tool. We do not provide financial advice, loan approvals, or e-KYC services.</p>
-                </div>
-                <div class="disclaimer-item">
-                    <h4>Not Licensed</h4>
-                    <p>We are not a licensed financial institution. All calculations are estimates. Consult professionals for advice.</p>
-                </div>
-                <div class="disclaimer-item">
-                    <h4>Bangladesh Compliance</h4>
-                    <p>Built with awareness of BFIU e-KYC and AML/CFT requirements. Regulated features disabled in educational mode.</p>
-                </div>
-                <div class="disclaimer-item">
-                    <h4>Open Source</h4>
-                    <p>Transparent formulas. Audit our code on GitHub. Contribute to improve financial literacy in Bangladesh.</p>
-                </div>
-            </div>
+        <div class="tool-gallery">
+            <article class="tool-card">
+                <header>
+                    <i class="fas fa-hand-holding-dollar"></i>
+                    <h3>Loan pre-assessment</h3>
+                </header>
+                <p>Quantify EMI limits, DTI shifts, and safe borrowing ranges before you meet a lender.</p>
+                <a href="/dashboard#loan" class="btn btn-outline">Run scenario</a>
+            </article>
+            <article class="tool-card">
+                <header>
+                    <i class="fas fa-calendar-check"></i>
+                    <h3>Payoff planner</h3>
+                </header>
+                <p>Visualize how extra payments shave months and interest off your debts with one slider.</p>
+                <a href="/dashboard#payoff" class="btn btn-outline">Map payoff</a>
+            </article>
+            <article class="tool-card">
+                <header>
+                    <i class="fas fa-seedling"></i>
+                    <h3>Goal accelerator</h3>
+                </header>
+                <p>Rebalance savings priorities and see how a higher monthly allocation pulls target dates closer.</p>
+                <a href="/dashboard#goals" class="btn btn-outline">Boost goals</a>
+            </article>
+            <article class="tool-card">
+                <header>
+                    <i class="fas fa-chart-bar"></i>
+                    <h3>Inflation forecast</h3>
+                </header>
+                <p>Project 1–30 year cost of essentials with CPI sensitivity controls built for Bangladeshi households.</p>
+                <a href="/dashboard#inflation" class="btn btn-outline">Forecast costs</a>
+            </article>
         </div>
     </div>
 </section>
 
-<!-- CTA Section -->
-<section class="cta-section">
-    <div class="container">
-        <h2>Ready to Take Control of Your Finances?</h2>
-        <p>Join thousands learning smarter money management</p>
-        <a href="/auth?mode=register" class="btn btn-primary btn-lg">Start Your Financial Journey</a>
+<section id="about" class="section section-alt">
+    <div class="container compliance-panel">
+        <div class="compliance-header">
+            <span class="eyebrow">Transparency first</span>
+            <h2>Know exactly what Peak Finance is (and isn’t)</h2>
+            <p>We operate in educational mode by default. Regulated workflows stay locked until partnered institutions enable them.</p>
+        </div>
+        <div class="compliance-grid">
+            <article>
+                <h3>Educational only</h3>
+                <p>No loan approvals, e-KYC, or credit bureau pulls. Use insights as learning aides before seeking licensed advice.</p>
+            </article>
+            <article>
+                <h3>Compliance-aware</h3>
+                <p>AI intents are classified against BFIU guardrails. Sensitive prompts are redacted and logged before being declined.</p>
+            </article>
+            <article>
+                <h3>Open & auditable</h3>
+                <p>Every formula, import parser, and AI prompt is open-source. Audit logs and feature flags keep you in control.</p>
+            </article>
+            <article>
+                <h3>Bangladesh-first</h3>
+                <p>Currency, locales, and inflation defaults tuned for Dhaka, Chattogram, and Sylhet cost of living realities.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="cta-banner">
+    <div class="container cta-inner">
+        <div>
+            <span class="eyebrow">Start today</span>
+            <h2>Command your finances with delight, not dread.</h2>
+            <p>Join thousands of Bangladeshis mastering their financial story with clarity, context, and community.</p>
+        </div>
+        <div class="cta-actions">
+            <a href="/auth?mode=register" class="btn btn-primary btn-glow">Launch dashboard</a>
+            <a href="/api/docs" class="btn btn-outline" target="_blank" rel="noopener">Read API docs</a>
+        </div>
     </div>
 </section>
 {% endblock %}

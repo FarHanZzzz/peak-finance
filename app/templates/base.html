@@ -3,89 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Peak Finance - Personal Finance Web App for Bangladesh">
+    <meta name="description" content="Peak Finance – Education-first personal finance studio for Bangladesh">
     <title>{% block title %}Peak Finance - Smart Financial Planning{% endblock %}</title>
-    
-    <!-- Font Awesome -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', path='/css/main.css') }}">
-    
+
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar">
-        <div class="container">
-            <div class="nav-brand">
-                <i class="fas fa-chart-line"></i>
-                <span>Peak Finance</span>
-            </div>
-            <div class="nav-menu" id="navMenu">
-                <a href="/" class="nav-link">Home</a>
-                <a href="/#features" class="nav-link">Features</a>
-                <a href="/#tools" class="nav-link">Tools</a>
-                <a href="/#about" class="nav-link">About</a>
-                <div class="nav-auth" id="navAuth">
-                    <a href="/auth" class="btn btn-outline" id="loginBtn">Login</a>
-                    <a href="/auth?mode=register" class="btn btn-primary" id="registerBtn">Sign Up</a>
-                </div>
-                <div class="nav-user hidden" id="navUser">
-                    <span id="userEmail"></span>
-                    <button class="btn btn-outline" id="logoutBtn">Logout</button>
-                </div>
-            </div>
-            <button class="nav-toggle" id="navToggle">
+        <div class="container nav-shell">
+            <a href="/" class="nav-brand">
+                <span class="brand-icon">
+                    <i class="fas fa-chart-line"></i>
+                </span>
+                <span class="brand-text">
+                    <span class="brand-title">Peak Finance</span>
+                    <span class="brand-tagline">Bangladesh personal finance lab</span>
+                </span>
+            </a>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
                 <i class="fas fa-bars"></i>
             </button>
+            <div class="nav-menu" id="navMenu">
+                <div class="nav-links">
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="/#features" class="nav-link">Features</a>
+                    <a href="/#tools" class="nav-link">Tools</a>
+                    <a href="/#about" class="nav-link">About</a>
+                       <a href="/dashboard" class="nav-link nav-dashboard hidden" id="dashboardLink">
+                           <span class="nav-dashboard-pill">
+                               <i class="fas fa-gauge-high"></i>
+                               <span>Dashboard</span>
+                           </span>
+                       </a>
+                </div>
+                <div class="nav-cta">
+                    <div class="nav-auth" id="navAuth">
+                        <a href="/auth" class="btn btn-outline" id="loginBtn">Login</a>
+                        <a href="/auth?mode=register" class="btn btn-primary" id="registerBtn">Get Started</a>
+                    </div>
+                    <div class="nav-user hidden" id="navUser">
+                        <span class="nav-user-email" id="userEmail"></span>
+                        <button class="btn btn-outline" id="logoutBtn">Logout</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main>
+    <main class="page-content">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
     <footer class="footer">
-        <div class="container">
+        <div class="container footer-container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <span class="brand-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </span>
+                    <div>
+                        <h4>Peak Finance</h4>
+                        <p>Education-first personal finance studio for Bangladesh. Built for clarity, literacy, and better money habits.</p>
+                    </div>
+                </div>
+                <a href="/auth?mode=register" class="btn btn-primary btn-glow">Create free account</a>
+            </div>
             <div class="footer-grid">
                 <div class="footer-col">
-                    <h4>Peak Finance</h4>
-                    <p>Educational financial planning tool for Bangladesh. Not a licensed financial advisor.</p>
-                </div>
-                <div class="footer-col">
-                    <h4>Product</h4>
-                    <a href="/#features">Features</a>
+                    <h5>Product</h5>
+                    <a href="/#features">Experience</a>
                     <a href="/#tools">Calculators</a>
-                    <a href="/api/docs">API Docs</a>
+                    <a href="/api/docs" target="_blank" rel="noopener">API Docs</a>
                 </div>
                 <div class="footer-col">
-                    <h4>Compliance</h4>
-                    <a href="https://bfiu.org.bd" target="_blank">BFIU Guidelines</a>
-                    <a href="https://www.bb.org.bd" target="_blank">Bangladesh Bank</a>
+                    <h5>Resources</h5>
+                    <a href="https://bfiu.org.bd" target="_blank" rel="noopener">BFIU Guidelines</a>
+                    <a href="https://www.bb.org.bd" target="_blank" rel="noopener">Bangladesh Bank</a>
+                    <a href="/health">System Health</a>
                 </div>
                 <div class="footer-col">
-                    <h4>Connect</h4>
+                    <h5>Stay Connected</h5>
                     <a href="#"><i class="fab fa-github"></i> GitHub</a>
                     <a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                    <a href="mailto:hello@peak.finance"><i class="fas fa-envelope"></i> Contact</a>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 Peak Finance. Educational use only. Not licensed financial advice.</p>
+                <p>&copy; 2025 Peak Finance. Educational use only. This platform does not provide regulated financial advice.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Toast Notification -->
     <div id="toast" class="toast hidden"></div>
 
-    <!-- Core JS -->
+    <button type="button" class="back-to-top-fab hidden" id="backToTopFab" aria-label="Back to top" aria-hidden="true">
+        <span class="fab-icon">
+            <i class="fas fa-arrow-up" aria-hidden="true"></i>
+            <span class="fab-plume" aria-hidden="true"></span>
+        </span>
+        <span class="fab-trail" aria-hidden="true"></span>
+    </button>
+
     <script src="{{ url_for('static', path='/js/api.js') }}"></script>
     <script src="{{ url_for('static', path='/js/auth.js') }}"></script>
     <script src="{{ url_for('static', path='/js/app.js') }}"></script>
-    
+
     {% block extra_js %}{% endblock %}
 </body>
 </html>

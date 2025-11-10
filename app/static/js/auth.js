@@ -112,6 +112,8 @@ const Auth = {
     const navAuth = document.getElementById('navAuth');
     const navUser = document.getElementById('navUser');
     const userEmail = document.getElementById('userEmail');
+  const dashboardLink = document.getElementById('dashboardLink');
+    const currentPath = window.location.pathname || '/';
 
     if (this.isAuthenticated()) {
       const user = await this.getCurrentUser();
@@ -119,14 +121,22 @@ const Auth = {
         navAuth?.classList.add('hidden');
         navUser?.classList.remove('hidden');
         if (userEmail) userEmail.textContent = user.email;
+        if (dashboardLink) {
+          dashboardLink.classList.remove('hidden');
+          dashboardLink.classList.toggle('active', currentPath.startsWith('/dashboard'));
+        }
       } else {
         // Token invalid, show login
         navAuth?.classList.remove('hidden');
         navUser?.classList.add('hidden');
+        dashboardLink?.classList.add('hidden');
+        dashboardLink?.classList.remove('active');
       }
     } else {
       navAuth?.classList.remove('hidden');
       navUser?.classList.add('hidden');
+      dashboardLink?.classList.add('hidden');
+      dashboardLink?.classList.remove('active');
     }
   }
 };
