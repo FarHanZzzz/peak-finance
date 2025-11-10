@@ -188,7 +188,7 @@ function renderDefaultSummary() {
     const income = dashboardData.user?.monthly_net_income || 0;
     
     statsGrid.innerHTML = `
-        <div class="stat-card primary">
+        <div class="stat-card ${income > 0 ? 'success' : 'warning'}">
             <div class="stat-icon"><i class="fas fa-wallet"></i></div>
             <div class="stat-info">
                 <p class="stat-label">Monthly Income</p>
@@ -263,7 +263,7 @@ function renderSummaryCards() {
 
     const statsGrid = document.getElementById('statsGrid');
     statsGrid.innerHTML = `
-        <div class="stat-card primary">
+        <div class="stat-card ${s.total_income > 0 ? 'success' : 'warning'}">
             <div class="stat-icon"><i class="fas fa-wallet"></i></div>
             <div class="stat-info">
                 <p class="stat-label">Monthly Income</p>
@@ -284,7 +284,7 @@ function renderSummaryCards() {
                 <h3 class="stat-value">${(s.dti * 100).toFixed(1)}%</h3>
             </div>
         </div>
-        <div class="stat-card success">
+        <div class="stat-card ${s.safe_to_spend >= 0 ? 'success' : 'danger'}">
             <div class="stat-icon"><i class="fas fa-hand-holding-usd"></i></div>
             <div class="stat-info">
                 <p class="stat-label">Safe to Spend</p>
