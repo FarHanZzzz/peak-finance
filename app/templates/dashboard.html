@@ -412,7 +412,7 @@ function escapeHtml(text) {
 // Modal functions
 function showProfileModal() {
     const modal = createModal('Update Profile', `
-        <form id="profileForm" class="form">
+    <form id="profileForm" class="form modal-form">
             <div class="form-group">
                 <label>Monthly Net Income (৳)</label>
                 <input type="number" id="monthlyIncome" value="${dashboardData.user.monthly_net_income}" required>
@@ -450,7 +450,7 @@ function showProfileModal() {
 
 function showAddExpenseModal() {
     const modal = createModal('Add Expense', `
-        <form id="expenseForm" class="form">
+    <form id="expenseForm" class="form modal-form">
             <div class="form-group">
                 <label>Expense Name</label>
                 <input type="text" id="expenseName" placeholder="e.g., Rent, Groceries" required>
@@ -493,7 +493,7 @@ function showAddExpenseModal() {
 
 function showAddDebtModal() {
     const modal = createModal('Add Debt/Loan', `
-        <form id="debtForm" class="form">
+    <form id="debtForm" class="form modal-form">
             <div class="form-group">
                 <label>Loan Name</label>
                 <input type="text" id="debtName" placeholder="e.g., Home Loan, Car Loan" required>
@@ -543,7 +543,7 @@ function showAddDebtModal() {
 
 function showAddGoalModal() {
     const modal = createModal('Add Financial Goal', `
-        <form id="goalForm" class="form">
+    <form id="goalForm" class="form modal-form">
             <div class="form-group">
                 <label>Goal Name</label>
                 <input type="text" id="goalName" placeholder="e.g., Emergency Fund, Vacation" required>

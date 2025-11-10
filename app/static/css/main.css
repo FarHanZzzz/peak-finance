@@ -1954,6 +1954,30 @@ body.theme-light .modal-close:hover {
   border-radius: var(--radius-sm);
   padding: 12px 14px;
   color: #fff;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.modal-form select:hover,
+.form-group select:hover,
+select:hover {
+  border-color: rgba(99, 102, 241, 0.45);
+}
+
+.modal-form select,
+.form-group select,
+select {
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: 48px;
+  cursor: pointer;
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 12px 12px;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.41.59L6 5.17 10.59.59 12 2l-6 6-6-6L1.41.59z' fill='%23dbeafe'/%3E%3C/svg%3E");
+}
+
+select::-ms-expand {
+  display: none;
 }
 
 body.theme-light .modal-form input,
@@ -1962,6 +1986,14 @@ body.theme-light .modal-form textarea {
   background: rgba(249, 248, 246, 0.95);
   border-color: rgba(201, 181, 156, 0.45);
   color: var(--text-primary);
+}
+
+body.theme-light select:hover {
+  border-color: rgba(201, 181, 156, 0.65);
+}
+
+body.theme-light select {
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.41.59L6 5.17 10.59.59 12 2l-6 6-6-6L1.41.59z' fill='%235c5040'/%3E%3C/svg%3E");
 }
 
 body.theme-light .modal-form input:focus,
