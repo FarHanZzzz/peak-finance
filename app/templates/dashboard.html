@@ -844,12 +844,10 @@ function showAIAdvisor() {
                 <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
                 <button type="submit" class="btn btn-primary">Get Guidance</button>
             </div>
-            <div id="aiResult" class="tool-result hidden"></div>
         </form>
     `);
 
     const form = document.getElementById('aiForm');
-    const resultBox = document.getElementById('aiResult');
     const submitBtn = form.querySelector('button[type="submit"]');
 
     form.addEventListener('submit', async (e) => {
@@ -864,26 +862,41 @@ function showAIAdvisor() {
         const originalText = submitBtn.textContent;
         submitBtn.disabled = true;
         submitBtn.textContent = 'Thinking…';
-        resultBox.classList.remove('hidden');
-        resultBox.innerHTML = '<div class="loading-inline"><i class="fas fa-spinner fa-spin"></i> Generating guidance…</div>';
 
         try {
             const result = await API.post('/ai/ask', { question });
-            const answerHtml = escapeHtml(result.answer).replace(/\n/g, '<br>');
-            resultBox.innerHTML = `
-                <div class="ai-response ${result.is_blocked ? 'blocked' : ''}">
-                    <p>${answerHtml}</p>
-                    ${result.is_blocked ? '<p class="warning">This topic requires a licensed financial services partner.</p>' : ''}
-                </div>
-                ${result.meta?.disclaimer ? `<p class="disclaimer">${escapeHtml(result.meta.disclaimer)}</p>` : ''}
-            `;
+            showAIResponse(result, question);
         } catch (error) {
-            resultBox.innerHTML = `<p class="error">${escapeHtml(error.message || 'AI advisor unavailable')}</p>`;
-        } finally {
+            showToast(error.message || 'AI advisor unavailable', 'error');
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
         }
     });
+}
+
+function showAIResponse(result, originalQuestion) {
+    closeModal();
+    
+    const answerHtml = escapeHtml(result.answer).replace(/\n/g, '<br>');
+    const isBlocked = result.is_blocked;
+    
+    createModal('AI Financial Guidance', `
+        <div class="ai-response-container">
+            <div class="ai-response-content ${isBlocked ? 'blocked' : ''}">
+                <p>${answerHtml}</p>
+                ${isBlocked ? '<p class="warning">This topic requires a licensed financial services partner.</p>' : ''}
+                ${result.meta?.disclaimer ? `<p class="disclaimer">${escapeHtml(result.meta.disclaimer)}</p>` : ''}
+            </div>
+            <div class="ai-response-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">
+                    <i class="fas fa-check"></i> Understood
+                </button>
+                <button type="button" class="btn btn-primary" onclick="closeModal(); showAIAdvisor();">
+                    <i class="fas fa-comment-dots"></i> Further Query
+                </button>
+            </div>
+        </div>
+    `);
 }
 
 function showDataImport() {

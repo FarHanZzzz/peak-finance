@@ -1935,6 +1935,8 @@ body.theme-light .modal-close:hover {
 
 .modal-body {
   padding: 30px;
+  max-height: calc(85vh - 120px);
+  overflow-y: auto;
 }
 
 .modal-form {
@@ -2031,6 +2033,8 @@ body.theme-light .modal-form textarea:focus {
   border: 1px solid rgba(99, 102, 241, 0.2);
   display: grid;
   gap: 18px;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 body.theme-light .tool-result {
@@ -2099,17 +2103,112 @@ body.theme-light .result-table td {
   border: 1px solid rgba(99, 102, 241, 0.24);
   padding: 18px;
   color: var(--text-secondary);
+  max-height: 350px;
+  overflow-y: auto;
+  line-height: 1.7;
 }
 
-body.theme-light .ai-response {
+.ai-response-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 350px;
+  max-height: 70vh;
+}
+
+.ai-response-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  border-radius: var(--radius-sm);
+  background: rgba(15, 23, 42, 0.78);
+  border: 1px solid rgba(99, 102, 241, 0.24);
+  color: var(--text-secondary);
+  line-height: 1.8;
+  font-size: 0.95rem;
+}
+
+.ai-response-content p {
+  margin-bottom: 16px;
+}
+
+.ai-response-content p:last-child {
+  margin-bottom: 0;
+}
+
+.ai-response-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 12px;
+  border-top: 1px solid rgba(99, 102, 241, 0.16);
+}
+
+body.theme-light .ai-response-actions {
+  border-top-color: rgba(201, 181, 156, 0.3);
+}
+
+body.theme-light .ai-response-content {
   background: #b6ae9f;
   border-color: rgba(92, 80, 64, 0.28);
   color: #fef6de;
 }
 
-.ai-response.blocked {
+.ai-response-content.blocked {
   border-color: rgba(245, 158, 11, 0.4);
   background: rgba(245, 158, 11, 0.1);
+}
+
+/* Custom scrollbar for AI response and tool results */
+.ai-response::-webkit-scrollbar,
+.ai-response-content::-webkit-scrollbar,
+.tool-result::-webkit-scrollbar,
+.modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ai-response::-webkit-scrollbar-track,
+.ai-response-content::-webkit-scrollbar-track,
+.tool-result::-webkit-scrollbar-track,
+.modal-body::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4);
+  border-radius: 4px;
+}
+
+.ai-response::-webkit-scrollbar-thumb,
+.ai-response-content::-webkit-scrollbar-thumb,
+.tool-result::-webkit-scrollbar-thumb,
+.modal-body::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.4);
+  border-radius: 4px;
+}
+
+.ai-response::-webkit-scrollbar-thumb:hover,
+.ai-response-content::-webkit-scrollbar-thumb:hover,
+.tool-result::-webkit-scrollbar-thumb:hover,
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.6);
+}
+
+body.theme-light .ai-response::-webkit-scrollbar-track,
+body.theme-light .ai-response-content::-webkit-scrollbar-track,
+body.theme-light .tool-result::-webkit-scrollbar-track,
+body.theme-light .modal-body::-webkit-scrollbar-track {
+  background: rgba(201, 181, 156, 0.2);
+}
+
+body.theme-light .ai-response::-webkit-scrollbar-thumb,
+body.theme-light .ai-response-content::-webkit-scrollbar-thumb,
+body.theme-light .tool-result::-webkit-scrollbar-thumb,
+body.theme-light .modal-body::-webkit-scrollbar-thumb {
+  background: rgba(92, 80, 64, 0.4);
+}
+
+body.theme-light .ai-response::-webkit-scrollbar-thumb:hover,
+body.theme-light .ai-response-content::-webkit-scrollbar-thumb:hover,
+body.theme-light .tool-result::-webkit-scrollbar-thumb:hover,
+body.theme-light .modal-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(92, 80, 64, 0.6);
 }
 
 /* ===== Toast ===== */
