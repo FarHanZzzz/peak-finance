@@ -115,7 +115,8 @@ General:
     # CORS
     ALLOWED_ORIGINS: List[str] = [
         "http://localhost:8000",
-        "http://127.0.0.1:8000"
+        "http://127.0.0.1:8000",
+        "https://peak-finance-gamma.vercel.app/"
     ]
     
     # Defaults for Bangladesh context
